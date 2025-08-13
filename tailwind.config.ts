@@ -61,7 +61,26 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				}
+				},
+				/* Brand colors */
+				starbucks: 'hsl(var(--starbucks))',
+				spotify: 'hsl(var(--spotify))',
+				nike: 'hsl(var(--nike))',
+				mcdonalds: 'hsl(var(--mcdonalds))',
+				hm: 'hsl(var(--hm))',
+				gap: 'hsl(var(--gap))',
+				'american-eagle': 'hsl(var(--american-eagle))'
+			},
+			backgroundImage: {
+				'hero-gradient': 'var(--hero-gradient)',
+				'card-gradient': 'var(--card-gradient)'
+			},
+			boxShadow: {
+				'glow-primary': 'var(--glow-primary)',
+				'glow-accent': 'var(--glow-accent)'
+			},
+			transitionTimingFunction: {
+				'smooth': 'cubic-bezier(0.4, 0, 0.2, 1)'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
