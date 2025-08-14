@@ -6,91 +6,87 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-export type Database = {
-  // Allows to automatically instanciate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
-  __InternalSupabase: {
-    PostgrestVersion: "13.0.4"
-  }
+export interface Database {
   public: {
     Tables: {
       gift_cards: {
         Row: {
-          brand_color: string | null
-          brand_logo_url: string | null
-          brand_name: string
-          created_at: string
-          description: string | null
-          expires_at: string | null
           id: string
-          is_favorite: boolean | null
-          offer_name: string
-          perks: string | null
-          redeem_number: string | null
-          sector: string
-          updated_at: string
           user_id: string
-          value: number | null
+          offer_name: string
+          brand_name: string
+          sector: string
+          redeem_number: string | null
+          perks: string | null
+          description: string | null
+          value: number
+          expires_at: string | null
+          brand_logo_url: string | null
+          brand_color: string
+          is_favorite: boolean
+          is_used: boolean
+          used_at: string | null
+          created_at: string
         }
         Insert: {
-          brand_color?: string | null
-          brand_logo_url?: string | null
-          brand_name: string
-          created_at?: string
-          description?: string | null
-          expires_at?: string | null
           id?: string
-          is_favorite?: boolean | null
-          offer_name: string
-          perks?: string | null
-          redeem_number?: string | null
-          sector: string
-          updated_at?: string
           user_id: string
-          value?: number | null
+          offer_name: string
+          brand_name: string
+          sector: string
+          redeem_number?: string | null
+          perks?: string | null
+          description?: string | null
+          value: number
+          expires_at?: string | null
+          brand_logo_url?: string | null
+          brand_color: string
+          is_favorite?: boolean
+          is_used?: boolean
+          used_at?: string | null
+          created_at?: string
         }
         Update: {
-          brand_color?: string | null
-          brand_logo_url?: string | null
-          brand_name?: string
-          created_at?: string
-          description?: string | null
-          expires_at?: string | null
           id?: string
-          is_favorite?: boolean | null
-          offer_name?: string
-          perks?: string | null
-          redeem_number?: string | null
-          sector?: string
-          updated_at?: string
           user_id?: string
-          value?: number | null
+          offer_name?: string
+          brand_name?: string
+          sector?: string
+          redeem_number?: string | null
+          perks?: string | null
+          description?: string | null
+          value?: number
+          expires_at?: string | null
+          brand_logo_url?: string | null
+          brand_color?: string
+          is_favorite?: boolean
+          is_used?: boolean
+          used_at?: string | null
+          created_at?: string
         }
-        Relationships: []
       }
       profiles: {
         Row: {
-          created_at: string
           id: string
-          updated_at: string
-          user_id: string
-          username: string | null
+          email: string
+          full_name: string | null
+          avatar_url: string | null
+          created_at: string
         }
         Insert: {
+          id: string
+          email: string
+          full_name?: string | null
+          avatar_url?: string | null
           created_at?: string
-          id?: string
-          updated_at?: string
-          user_id: string
-          username?: string | null
         }
         Update: {
-          created_at?: string
           id?: string
-          updated_at?: string
-          user_id?: string
-          username?: string | null
+          email?: string
+          full_name?: string | null
+          avatar_url?: string | null
+          created_at?: string
         }
-        Relationships: []
       }
     }
     Views: {

@@ -3,8 +3,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
 import { GiftCard } from './GiftCard';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, Search } from 'lucide-react';
 import { AddCardDialog } from './AddCardDialog';
+import { CardDetailDialog } from './CardDetailDialog';
+import { useNavigate } from 'react-router-dom';
+import { Input } from '@/components/ui/input';
 
 interface GiftCardData {
   id: string;
@@ -20,6 +23,8 @@ interface GiftCardData {
   is_favorite: boolean;
   expires_at?: string;
   created_at: string;
+  is_used?: boolean;
+  used_at?: string;
 }
 
 interface GiftCardGridProps {
@@ -31,6 +36,10 @@ export const GiftCardGrid = ({ activeTab }: GiftCardGridProps) => {
   const [cards, setCards] = useState<GiftCardData[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddDialog, setShowAddDialog] = useState(false);
+  const [showDetailDialog, setShowDetailDialog] = useState(false);
+  const [selectedCard, setSelectedCard] = useState<GiftCardData | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const navigate = useNavigate();
 
   const fetchCards = async () => {
     if (!user) return;
@@ -67,6 +76,16 @@ export const GiftCardGrid = ({ activeTab }: GiftCardGridProps) => {
   }, [user, activeTab]);
 
   const handleToggleFavorite = async (cardId: string, isFavorite: boolean) => {
+    // Update local state immediately for instant feedback
+    setCards(prevCards => 
+      prevCards.map(card => 
+        card.id === cardId 
+          ? { ...card, is_favorite: !isFavorite }
+          : card
+      )
+    );
+    
+    // Update database in background
     try {
       const { error } = await supabase
         .from('gift_cards')
@@ -74,9 +93,10 @@ export const GiftCardGrid = ({ activeTab }: GiftCardGridProps) => {
         .eq('id', cardId);
 
       if (error) throw error;
-      fetchCards();
     } catch (error) {
       console.error('Error updating favorite:', error);
+      // Revert on error
+      fetchCards();
     }
   };
 
@@ -84,6 +104,32 @@ export const GiftCardGrid = ({ activeTab }: GiftCardGridProps) => {
     fetchCards();
     setShowAddDialog(false);
   };
+
+  const handleCardUpdated = () => {
+    fetchCards();
+  };
+
+  const handleCardClick = (card: any) => {
+    setSelectedCard(card);
+    setShowDetailDialog(true);
+  };
+
+  const handleAddCard = () => {
+    if (!user) {
+      navigate('/auth');
+      return;
+    }
+    setShowAddDialog(true);
+  };
+
+  // Filter out used cards from the main display
+  const filteredCards = cards
+    .filter(card => !card.is_used) // Remove used cards from homepage
+    .filter(card =>
+      card.brand_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      card.offer_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      card.sector.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
   if (loading) {
     return (
@@ -99,6 +145,17 @@ export const GiftCardGrid = ({ activeTab }: GiftCardGridProps) => {
 
   return (
     <div className="space-y-6">
+      {/* Search Bar */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+        <Input
+          placeholder="Search by brand name, offer, or sector..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="pl-10 bg-card border-border"
+        />
+      </div>
+
       {isFirstTime && (
         <div className="text-center py-12 space-y-6">
           <div className="max-w-2xl mx-auto">
@@ -124,7 +181,8 @@ export const GiftCardGrid = ({ activeTab }: GiftCardGridProps) => {
               brandName="Starbucks"
               sector="Food"
               value={0}
-              brandColor="hsl(155, 59%, 27%)"
+              brandColor="#00704A"
+              brandLogoUrl="https://logo.clearbit.com/starbucks.com"
               isFavorite={false}
               onToggleFavorite={() => {}}
               isSample
@@ -135,7 +193,8 @@ export const GiftCardGrid = ({ activeTab }: GiftCardGridProps) => {
               brandName="American Eagle"
               sector="Fashion"
               value={0}
-              brandColor="hsl(219, 100%, 66%)"
+              brandColor="#1e40af"
+              brandLogoUrl="https://logo.clearbit.com/ae.com"
               isFavorite={false}
               onToggleFavorite={() => {}}
               isSample
@@ -146,7 +205,8 @@ export const GiftCardGrid = ({ activeTab }: GiftCardGridProps) => {
               brandName="Spotify Premium"
               sector="Entertainment"
               value={0}
-              brandColor="hsl(141, 73%, 42%)"
+              brandColor="#1DB954"
+              brandLogoUrl="https://logo.clearbit.com/spotify.com"
               isFavorite={false}
               onToggleFavorite={() => {}}
               isSample
@@ -157,7 +217,44 @@ export const GiftCardGrid = ({ activeTab }: GiftCardGridProps) => {
               brandName="Nike Member"
               sector="Sports"
               value={0}
-              brandColor="hsl(0, 0%, 0%)"
+              brandColor="#111111"
+              brandLogoUrl="https://logo.clearbit.com/nike.com"
+              isFavorite={false}
+              onToggleFavorite={() => {}}
+              isSample
+            />
+            <GiftCard
+              id="sample-5"
+              offerName="Food • Gift"
+              brandName="McDonald's"
+              sector="Food"
+              value={0}
+              brandColor="#FFC300"
+              brandLogoUrl="https://logo.clearbit.com/mcdonalds.com"
+              isFavorite={false}
+              onToggleFavorite={() => {}}
+              isSample
+            />
+            <GiftCard
+              id="sample-6"
+              offerName="Fashion • Gift"
+              brandName="H&M Club"
+              sector="Fashion"
+              value={0}
+              brandColor="#E5002A"
+              brandLogoUrl="https://logo.clearbit.com/hm.com"
+              isFavorite={false}
+              onToggleFavorite={() => {}}
+              isSample
+            />
+            <GiftCard
+              id="sample-7"
+              offerName="Retail • Gift"
+              brandName="Gap Gift"
+              sector="Retail"
+              value={0}
+              brandColor="#2A4B9B"
+              brandLogoUrl="https://logo.clearbit.com/gap.com"
               isFavorite={false}
               onToggleFavorite={() => {}}
               isSample
@@ -173,7 +270,7 @@ export const GiftCardGrid = ({ activeTab }: GiftCardGridProps) => {
           {activeTab === 'expiring' && 'Expiring Soon'}
         </h3>
         <Button
-          onClick={() => setShowAddDialog(true)}
+          onClick={handleAddCard}
           className="bg-primary text-primary-foreground hover:bg-primary/90 transition-all hover:shadow-glow-primary"
         >
           <Plus className="mr-2 h-4 w-4" />
@@ -181,17 +278,19 @@ export const GiftCardGrid = ({ activeTab }: GiftCardGridProps) => {
         </Button>
       </div>
 
-      {cards.length === 0 && !isFirstTime ? (
+      {filteredCards.length === 0 && !isFirstTime ? (
         <div className="text-center py-12">
           <p className="text-muted-foreground">
-            {activeTab === 'favorites' && 'No favorite cards yet'}
-            {activeTab === 'expiring' && 'No cards expiring soon'}
-            {activeTab === 'all' && 'No cards added yet'}
+            {searchQuery ? 'No cards match your search' : 
+              activeTab === 'favorites' && 'No favorite cards yet' ||
+              activeTab === 'expiring' && 'No cards expiring soon' ||
+              activeTab === 'all' && 'No cards added yet'
+            }
           </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {cards.map((card) => (
+          {filteredCards.map((card) => (
             <GiftCard
               key={card.id}
               id={card.id}
@@ -207,6 +306,7 @@ export const GiftCardGrid = ({ activeTab }: GiftCardGridProps) => {
               isFavorite={card.is_favorite}
               expiresAt={card.expires_at}
               onToggleFavorite={handleToggleFavorite}
+              onCardClick={handleCardClick}
             />
           ))}
         </div>
@@ -216,6 +316,14 @@ export const GiftCardGrid = ({ activeTab }: GiftCardGridProps) => {
         open={showAddDialog}
         onOpenChange={setShowAddDialog}
         onCardAdded={handleCardAdded}
+      />
+
+      <CardDetailDialog
+        open={showDetailDialog}
+        onOpenChange={setShowDetailDialog}
+        card={selectedCard}
+        onToggleFavorite={handleToggleFavorite}
+        onCardUpdated={handleCardUpdated}
       />
     </div>
   );
