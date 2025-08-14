@@ -91,12 +91,8 @@ export const GiftCard = ({
     // Update local state instantly for immediate feedback
     setIsLiked(!isLiked);
     
-    // Call the parent function without waiting
-    onToggleFavorite(id, isLiked).catch((error) => {
-      // Only revert on error, don't wait for success
-      console.error('Error updating favorite:', error);
-      setIsLiked(isFavorite);
-    });
+    // Call the parent function
+    onToggleFavorite(id, isLiked);
     
     // Stop animation quickly for snappy feel
     setTimeout(() => setIsAnimating(false), 150);
