@@ -20,7 +20,7 @@ const Index = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-background p-4">
+      <div className="min-h-screen bg-background p-4 overflow-y-auto">
         <div className="max-w-7xl mx-auto">
           <div className="text-center py-12 space-y-6">
             <div className="max-w-4xl mx-auto">
@@ -50,7 +50,7 @@ const Index = () => {
               </div>
             </div>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-12">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-12 pb-12">
               {/* Sample cards for welcome page */}
               <GiftCard
                 id="sample-1"
@@ -142,18 +142,17 @@ const Index = () => {
       </div>
     );
   }
-
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-background">
+      <div className="min-h-screen flex w-full bg-background overflow-hidden">
         <AppSidebar activeTab={activeTab} onTabChange={setActiveTab} />
-        <main className="flex-1">
-          <header className="h-16 flex items-center border-b border-border px-6">
+        <main className="flex-1 overflow-y-auto">
+          <header className="h-16 flex items-center border-b border-border px-6 bg-background sticky top-0 z-10">
             <SidebarTrigger />
             <h1 className="text-2xl font-bold text-foreground ml-4">My Gift Cards</h1>
           </header>
           
-          <div className="p-6">
+          <div className="p-6 pb-20">
             <GiftCardGrid activeTab={activeTab} />
           </div>
         </main>

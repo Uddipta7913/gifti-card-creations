@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,16 +10,26 @@ import { toast } from 'sonner';
 import { Loader2, Gift } from 'lucide-react';
 
 const Auth = () => {
-  const { user, signIn, signUp } = useAuth();
-  const [loading, setLoading] = useState(false);
+  const { user, loading, signIn, signUp } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
-  if (user) {
-    return <Navigate to="/" replace />;
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (user && !loading) {
+      navigate('/');
+    }
+  }, [user, loading, navigate]);
+
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+    </div>;
   }
 
   const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true);
+    setIsLoading(true);
     
     const formData = new FormData(e.currentTarget);
     const email = formData.get('email') as string;
@@ -33,12 +43,12 @@ const Auth = () => {
       toast.success('Welcome back!');
     }
     
-    setLoading(false);
+    setIsLoading(false);
   };
 
   const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true);
+    setIsLoading(true);
     
     const formData = new FormData(e.currentTarget);
     const email = formData.get('email') as string;
@@ -53,12 +63,12 @@ const Auth = () => {
       toast.success('Account created successfully! Please check your email to verify your account.');
     }
     
-    setLoading(false);
+    setIsLoading(false);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <div className="w-full max-w-md space-y-8">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4 overflow-y-auto">
+      <div className="w-full max-w-md space-y-8 py-8">
         <div className="text-center">
           <div className="flex justify-center mb-4">
             <div className="p-3 rounded-2xl bg-hero-gradient">
@@ -114,9 +124,9 @@ const Auth = () => {
                   <Button
                     type="submit"
                     className="w-full bg-hero-gradient text-background font-semibold hover:opacity-90 transition-opacity"
-                    disabled={loading}
+                    disabled={isLoading}
                   >
-                    {loading ? (
+                    {isLoading ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         Signing in...
@@ -165,9 +175,9 @@ const Auth = () => {
                   <Button
                     type="submit"
                     className="w-full bg-hero-gradient text-background font-semibold hover:opacity-90 transition-opacity"
-                    disabled={loading}
+                    disabled={isLoading}
                   >
-                    {loading ? (
+                    {isLoading ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         Creating account...
